@@ -18,7 +18,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
-import frc.robot.commands.SwerveJoystickCmd;
+import frc.robot.commands.SwerveTeleop;
 import frc.robot.subsystems.SwerveSubsystem;
 
 public class RobotContainer {
@@ -28,7 +28,7 @@ public class RobotContainer {
     private final Joystick driverJoytick = new Joystick(OIConstants.kDriverControllerPort);
 
     public RobotContainer() {
-        swerveSubsystem.setDefaultCommand(new SwerveJoystickCmd(
+        swerveSubsystem.setDefaultCommand(new SwerveTeleop(
                 swerveSubsystem,
                 () -> -driverJoytick.getRawAxis(OIConstants.kDriverYAxis),
                 () -> driverJoytick.getRawAxis(OIConstants.kDriverXAxis),
