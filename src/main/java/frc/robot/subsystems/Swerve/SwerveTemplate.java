@@ -4,9 +4,13 @@
 
 package frc.robot.subsystems.Swerve;
 
+import org.ejml.dense.row.misc.RrefGaussJordanRowPivot_DDRM;
+
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.config.SparkBaseConfig;
+import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.math.controller.PIDController;
@@ -14,6 +18,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.MotorConstants;
 
 public class SwerveTemplate extends SubsystemBase {
 
@@ -32,6 +37,13 @@ public class SwerveTemplate extends SubsystemBase {
         double absEncoderOffset) {
 
       driveMotor = new SparkMax(driveMotorId, MotorType.kBrushless);
+        SparkMaxConfig configsDrive = new SparkMaxConfig();
+        configsDrive.closedLoop.pid();
+        configsDrive.inverted(driveMotorReversed);
+        configsDrive.smartCurrentLimit(
+            MotorConstants.CurrentLimits.kDriveStatorCurrentLimit, 
+            MotorConstants.CurrentLimits.kDriveSupplyCurrentLimit);
+
       steerMotor = new SparkMax(steerMotorId, MotorType.kBrushless);
 
         

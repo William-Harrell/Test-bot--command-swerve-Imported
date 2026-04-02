@@ -101,4 +101,16 @@ public final class Constants {
 
         public static final double kDeadband = 0.05;
     }
+
+    public static final class MotorConstants {
+
+        public static final class CurrentLimits {
+                // All Drive motors
+            public static final int kDriveStatorCurrentLimit = 120;
+            public static final int kDriveSupplyCurrentLimit = 70;
+                // All Steer motors
+            public static final int kSteerStatorCurrentLimit = 60;
+            public static final int kSteerSupplyCurrentLimit = 50;
+        }
+    }
 }
