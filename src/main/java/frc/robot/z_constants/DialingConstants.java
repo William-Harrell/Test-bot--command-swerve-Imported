@@ -8,12 +8,12 @@ package frc.robot.z_constants;
 public class DialingConstants {
 
     public static final class Swerve {
-        public static final double kFLabsEncoderOffsetRad = -0.254;
-        public static final double kBLabsEncoderOffsetRad = -1.252;
-        public static final double kFRabsEncoderOffsetRad = -1.816;
-        public static final double kBRabsEncoderOffsetRad = -4.811;
+        public static final double kFLabsEncoderOffsetRad = -0.198242;
+        public static final double kBLabsEncoderOffsetRad = -0.242188;
+        public static final double kFRabsEncoderOffsetRad = -0.210938;
+        public static final double kBRabsEncoderOffsetRad = -0.224121;
 
-        public static final class SteeringPIDController {
+        public static final class HeadingPID {
             public static final double kSteerP = 0.5;
             public static final double kSteerI = 0;
             public static final double kSteerD = 0;
@@ -25,7 +25,7 @@ public class DialingConstants {
             public static final double kDriveI = 0;
             public static final double kDriveD = 0;
             // All Steer Motors
-            public static final double kSteerP = 0.5;
+            public static final double kSteerP = 0.3;
             public static final double kSteerI = 0;
             public static final double kSteerD = 0;
         }

@@ -76,9 +76,9 @@ public class SwerveTemplate extends SubsystemBase {
         absEncoder = new CANcoder(absEncoderId);
 
         steerPidController = new PIDController(
-            Swerve.SteeringPIDController.kSteerP,
-            Swerve.SteeringPIDController.kSteerI,
-            Swerve.SteeringPIDController.kSteerD
+            Swerve.HeadingPID.kSteerP,
+            Swerve.HeadingPID.kSteerI,
+            Swerve.HeadingPID.kSteerD
         );
         steerPidController.enableContinuousInput(-Math.PI, Math.PI);
 

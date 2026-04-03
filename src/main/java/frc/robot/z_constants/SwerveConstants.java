@@ -13,20 +13,20 @@ import edu.wpi.first.math.util.Units;
 public class SwerveConstants {
 
     public static final class IndividualModules {
-
-        public static final boolean kFLDriveEncoderReversed = true;
-        public static final boolean kFLSteerEncoderReversed = true;
+            //TODO: Might have to fix these
+        public static final boolean kFLDriveEncoderReversed = false;
+        public static final boolean kFLSteerEncoderReversed = false;
         public static final boolean kFLabsEncoderReversed = false;
 
         public static final boolean kFRDriveEncoderReversed = false;
-        public static final boolean kFRSteerEncoderReversed = true;
+        public static final boolean kFRSteerEncoderReversed = false;
         public static final boolean kFRabsEncoderReversed = false;
 
-        public static final boolean kBLDriveEncoderReversed = true;
-        public static final boolean kBLSteerEncoderReversed = true;
+        public static final boolean kBLDriveEncoderReversed = false;
+        public static final boolean kBLSteerEncoderReversed = false;
         public static final boolean kBLabsEncoderReversed = false;
 
-        public static final boolean kBRSteerEncoderReversed = true;
+        public static final boolean kBRSteerEncoderReversed = false;
         public static final boolean kBRDriveEncoderReversed = false;
         public static final boolean kBRabsEncoderReversed = false;
     }
@@ -36,19 +36,23 @@ public class SwerveConstants {
 
         public static final class PhysicalConstants {
                 // Minimum speed to move in m/s
-            public static final double kMinSpeed = 0.001;
+            public static final double kMinSpeed = 0.005;
                 // Distance between right and left wheels
-            public static final double kTrackWidth = Units.inchesToMeters(21);
+            public static final double kTrackWidth = Units.inchesToMeters(19);
                 // Distance between front and back wheels
-            public static final double kWheelBase = Units.inchesToMeters(25.5);
+            public static final double kWheelBase = Units.inchesToMeters(19);
                 // literal max speed in m/s
             public static final double kPhysicalMaxSpeed = 5; 
                 // literal max turning speed in rads/s 
-            public static final double kPhysicalMaxAngularSpeed = 2 * 2 * Math.PI; 
+            public static final double kPhysicalMaxAngularSpeed = 2 * 2 * Math.PI; // No idea
 
             public static final double kWheelDiameterMeters = Units.inchesToMeters(4);
-            public static final double kDriveMotorGearRatio = 1 / 5.8462;
-            public static final double kSteerMotorGearRatio = 1 / 18.0;
+            public static final double kDriveMotorGearRatio = 1 / 6.75;
+                private static final double SteerGearRatioNUM = 150;
+                private static final double SteerGearRatioDOM = 7;
+                private static final double SteerGearRatio = SteerGearRatioNUM / SteerGearRatioDOM;
+            public static final double kSteerMotorGearRatio = 1 / SteerGearRatio;
+
 
             public static final double kDriveEncoderRot2Meter = kDriveMotorGearRatio * Math.PI * kWheelDiameterMeters;
             public static final double kSteerEncoderRot2Rad = kSteerMotorGearRatio * 2 * Math.PI;
