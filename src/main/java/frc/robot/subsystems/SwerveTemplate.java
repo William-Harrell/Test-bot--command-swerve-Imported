@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.subsystems.Swerve;
+package frc.robot.subsystems;
 
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.revrobotics.spark.SparkMax;
@@ -17,9 +17,11 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.MotorConstants;
-import frc.robot.Constants.ModuleConstants;
-import frc.robot.Constants.DriveConstants;
+
+
+import frc.robot.z_constants.DialingConstants.Swerve;
+import frc.robot.z_constants.SwerveConstants.AllModules.CurrentLimits;
+import frc.robot.z_constants.SwerveConstants.AllModules.PhysicalConstants;
 
 public class SwerveTemplate extends SubsystemBase {
 
@@ -41,13 +43,13 @@ public class SwerveTemplate extends SubsystemBase {
       driveMotor = new SparkMax(driveMotorId, MotorType.kBrushless);
         SparkMaxConfig configsDrive = new SparkMaxConfig();
         configsDrive.closedLoop.pid(
-            MotorConstants.PIDConstants.kDriveP,
-            MotorConstants.PIDConstants.kDriveI, 
-            MotorConstants.PIDConstants.kDriveD);
+            Swerve.MotorPID.kDriveP,
+            Swerve.MotorPID.kDriveI, 
+            Swerve.MotorPID.kDriveD);
         configsDrive.inverted(driveMotorReversed);
         configsDrive.smartCurrentLimit(
-            MotorConstants.CurrentLimits.kDriveStatorCurrentLimit, 
-            MotorConstants.CurrentLimits.kDriveSupplyCurrentLimit);
+            CurrentLimits.kDriveStatorCurrentLimit, 
+            CurrentLimits.kDriveSupplyCurrentLimit);
         configsDrive.idleMode(IdleMode.kCoast);
         driveMotor.configure(configsDrive, 
             ResetMode.kNoResetSafeParameters, 
@@ -56,13 +58,13 @@ public class SwerveTemplate extends SubsystemBase {
       steerMotor = new SparkMax(steerMotorId, MotorType.kBrushless);
         SparkMaxConfig configsSteer = new SparkMaxConfig();
         configsSteer.closedLoop.pid(
-            MotorConstants.PIDConstants.kSteerP,
-            MotorConstants.PIDConstants.kSteerI, 
-            MotorConstants.PIDConstants.kSteerD);
+            Swerve.MotorPID.kSteerP,
+            Swerve.MotorPID.kSteerI, 
+            Swerve.MotorPID.kSteerD);
         configsSteer.inverted(steerMotorReversed);
         configsSteer.smartCurrentLimit(
-            MotorConstants.CurrentLimits.kSteerStatorCurrentLimit, 
-            MotorConstants.CurrentLimits.kSteerSupplyCurrentLimit);
+            CurrentLimits.kSteerStatorCurrentLimit, 
+            CurrentLimits.kSteerSupplyCurrentLimit);
         configsSteer.idleMode(IdleMode.kBrake);
         steerMotor.configure(configsSteer, 
             ResetMode.kNoResetSafeParameters, 
@@ -74,9 +76,9 @@ public class SwerveTemplate extends SubsystemBase {
         absEncoder = new CANcoder(absEncoderId);
 
         steerPidController = new PIDController(
-            ModuleConstants.kPSteer,
-            ModuleConstants.kISteer,
-            ModuleConstants.kDSteer
+            Swerve.SteeringPIDController.kSteerP,
+            Swerve.SteeringPIDController.kSteerI,
+            Swerve.SteeringPIDController.kSteerD
         );
         steerPidController.enableContinuousInput(-Math.PI, Math.PI);
 
@@ -85,25 +87,25 @@ public class SwerveTemplate extends SubsystemBase {
 
     public double getDrivePosition() {
         var DrivePosition = driveMotor.getEncoder().getPosition() * 
-            ModuleConstants.kDriveEncoderRot2Meter;
+            PhysicalConstants.kDriveEncoderRot2Meter;
         return DrivePosition;
     }
 
     public double getSteerPosition() {
         var SteerPosition = steerMotor.getEncoder().getPosition() * 
-            ModuleConstants.kSteerEncoderRot2Rad;
+            PhysicalConstants.kSteerEncoderRot2Rad;
         return SteerPosition;
     }
 
     public double getDriveVelocity() {
         var DriveVelocity = driveMotor.getEncoder().getVelocity() * 
-            ModuleConstants.kDriveEncoderRPM2MeterPerSec;
+            PhysicalConstants.kDriveEncoderRPM2MeterPerSec;
         return DriveVelocity;
     }
 
     public double getSteerVelocity() {
         var SteerVelocity = steerMotor.getEncoder().getVelocity() * 
-            ModuleConstants.kSteerEncoderRPM2RadPerSec;
+            PhysicalConstants.kSteerEncoderRPM2RadPerSec;
         return SteerVelocity;
     }
 
@@ -126,7 +128,7 @@ public class SwerveTemplate extends SubsystemBase {
     // TODO: Fix below in the command/Module area
     public void setDesiredState(SwerveModuleState desiredState) {
     if (Math.abs(desiredState.speedMetersPerSecond) < 
-        DriveConstants.kMinSpeed) {
+        PhysicalConstants.kMinSpeed) {
       stop();
       return;
     }
@@ -139,13 +141,11 @@ public class SwerveTemplate extends SubsystemBase {
     correctedDesiredState.optimize(new Rotation2d(absEncoder.getPosition().getValueAsDouble()));
 
     driveMotor.set(desiredState.speedMetersPerSecond / 
-        DriveConstants.kPhysicalMaxSpeedMetersPerSecond);
+        PhysicalConstants.kPhysicalMaxSpeed);
     steerMotor.set(steerPidController.calculate(getSteerPosition(), 
         desiredState.angle.getRadians()));
-
-
-
-        SmartDashboard.putString("Swerve[" + absEncoder.getDeviceID() + "] state", desiredState.toString());
+        SmartDashboard.putString("Swerve[" + absEncoder.getDeviceID() + 
+            "] state", desiredState.toString());
     }
 
     public SwerveModulePosition getSwerveModulePosition() {

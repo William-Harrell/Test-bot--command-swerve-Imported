@@ -1,6 +1,11 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 package frc.robot;
 
 import java.util.List;
+
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -15,42 +20,43 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import frc.robot.Constants.AutoConstants;
-import frc.robot.Constants.DriveConstants;
-import frc.robot.Constants.OIConstants;
 import frc.robot.commands.SwerveTeleop;
 import frc.robot.commands.zeroHeading_hotfix;
 import frc.robot.subsystems.SwerveSubsystem;
+
+import frc.robot.z_constants.ControllerConstants;
+import frc.robot.z_constants.SwerveConstants.AllModules.AutoDriving;
+import frc.robot.z_constants.SwerveConstants.AllModules.PhysicalConstants;
 
 public class RobotContainer {
 
     private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
 
-    private final Joystick driverJoytick = new Joystick(OIConstants.kDriverControllerPort);
+    private final Joystick driverJoytick = new Joystick(ControllerConstants.kDriverControllerPort);
 
     public RobotContainer() {
         swerveSubsystem.setDefaultCommand(new SwerveTeleop(
                 swerveSubsystem,
-                () -> -driverJoytick.getRawAxis(OIConstants.kDriverYAxis),
-                () -> driverJoytick.getRawAxis(OIConstants.kDriverXAxis),
-                () -> driverJoytick.getRawAxis(OIConstants.kDriverRotAxis),
-                () -> !driverJoytick.getRawButton(OIConstants.kDriverFieldOrientedButtonIdx)));
+                () -> -driverJoytick.getRawAxis(ControllerConstants.kDriverYAxis),
+                () -> driverJoytick.getRawAxis(ControllerConstants.kDriverXAxis),
+                () -> driverJoytick.getRawAxis(ControllerConstants.kDriverRotAxis),
+                () -> !driverJoytick.getRawButton(ControllerConstants.kDriverFieldOrientedButtonIdx)));
 
         configureButtonBindings();
     }
 
     private void configureButtonBindings() {
         new JoystickButton(driverJoytick, 
-                Constants.OIConstants.kDriverZeroHeadingButtonIdx)
+                ControllerConstants.kDriverZeroHeadingButtonIdx)
                 .onTrue(new zeroHeading_hotfix());
     }
 
     public Command getAutonomousCommand() {
         // 1. Create trajectory settings
         TrajectoryConfig trajectoryConfig = new TrajectoryConfig(
-                AutoConstants.kMaxSpeedMetersPerSecond,
-                AutoConstants.kMaxAccelerationMetersPerSecondSquared)
-                        .setKinematics(DriveConstants.kDriveKinematics);
+                AutoDriving.kMaxSpeedMetersPerSecond,
+                AutoDriving.kMaxAccelerationMetersPerSecondSquared)
+                        .setKinematics(PhysicalConstants.kDriveKinematics);
 
         // 2. Generate trajectory
         Trajectory trajectory = TrajectoryGenerator.generateTrajectory(
@@ -62,17 +68,17 @@ public class RobotContainer {
                 trajectoryConfig);
 
         // 3. Define PID controllers for tracking trajectory
-        PIDController xController = new PIDController(AutoConstants.kPXController, 0, 0);
-        PIDController yController = new PIDController(AutoConstants.kPYController, 0, 0);
+        PIDController xController = new PIDController(AutoDriving.kPXController, 0, 0);
+        PIDController yController = new PIDController(AutoDriving.kPYController, 0, 0);
         ProfiledPIDController thetaController = new ProfiledPIDController(
-                AutoConstants.kPThetaController, 0, 0, AutoConstants.kThetaControllerConstraints);
+                AutoDriving.kPThetaController, 0, 0, AutoDriving.kThetaControllerConstraints);
         thetaController.enableContinuousInput(-Math.PI, Math.PI);
 
         // 4. Construct command to follow trajectory
         SwerveControllerCommand swerveControllerCommand = new SwerveControllerCommand(
                 trajectory,
                 swerveSubsystem::getPose,
-                DriveConstants.kDriveKinematics,
+                PhysicalConstants.kDriveKinematics,
                 xController,
                 yController,
                 thetaController,

@@ -1,3 +1,7 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
@@ -9,49 +13,52 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.DriveConstants;
-import frc.robot.subsystems.Swerve.SwerveTemplate;
+
+import frc.robot.z_constants.SwerveConstants.AllModules.PhysicalConstants;
+import frc.robot.z_constants.CanIDs;
+import frc.robot.z_constants.SwerveConstants.IndividualModules;
+import frc.robot.z_constants.DialingConstants.Swerve;
 
 public class SwerveSubsystem extends SubsystemBase {
     private final SwerveTemplate frontLeft = new SwerveTemplate(
-            DriveConstants.kFrontLeftDriveMotorPort,
-            DriveConstants.kFrontLeftSteerMotorPort,
-            DriveConstants.kFrontLeftDriveAbsoluteEncoderPort,
-            DriveConstants.kFrontLeftDriveEncoderReversed,
-            DriveConstants.kFrontLeftSteerEncoderReversed,
-            DriveConstants.kFrontLeftDriveAbsoluteEncoderReversed,            
-            DriveConstants.kFrontLeftDriveAbsoluteEncoderOffsetRad);
+            CanIDs.kFLDriveMotorPort,
+            CanIDs.kFLSteerMotorPort,
+            CanIDs.kFLabsEncoderPort,
+            IndividualModules.kFLDriveEncoderReversed,
+            IndividualModules.kFLSteerEncoderReversed,
+            IndividualModules.kFLabsEncoderReversed,            
+            Swerve.kFLabsEncoderOffsetRad);
 
     private final SwerveTemplate frontRight = new SwerveTemplate(
-            DriveConstants.kFrontRightDriveMotorPort,
-            DriveConstants.kFrontRightSteerMotorPort,
-            DriveConstants.kFrontRightDriveAbsoluteEncoderPort,
-            DriveConstants.kFrontRightDriveEncoderReversed,
-            DriveConstants.kFrontRightSteerEncoderReversed,
-            DriveConstants.kFrontRightDriveAbsoluteEncoderReversed,
-            DriveConstants.kFrontRightDriveAbsoluteEncoderOffsetRad);
+            CanIDs.kFRDriveMotorPort,
+            CanIDs.kFRSteerMotorPort,
+            CanIDs.kFRabsEncoderPort,
+            IndividualModules.kFRDriveEncoderReversed,
+            IndividualModules.kFRSteerEncoderReversed,
+            IndividualModules.kFRabsEncoderReversed,
+            Swerve.kFRabsEncoderOffsetRad);
 
     private final SwerveTemplate backLeft = new SwerveTemplate(
-            DriveConstants.kBackLeftDriveMotorPort,
-            DriveConstants.kBackLeftSteerMotorPort,
-            DriveConstants.kBackLeftDriveAbsoluteEncoderPort,
-            DriveConstants.kBackLeftDriveEncoderReversed,
-            DriveConstants.kBackLeftSteerEncoderReversed,
-            DriveConstants.kBackLeftDriveAbsoluteEncoderReversed,
-            DriveConstants.kBackLeftDriveAbsoluteEncoderOffsetRad);
+            CanIDs.kBLDriveMotorPort,
+            CanIDs.kBLSteerMotorPort,
+            CanIDs.kBLabsEncoderPort,
+            IndividualModules.kBLDriveEncoderReversed,
+            IndividualModules.kBLSteerEncoderReversed,
+            IndividualModules.kBLabsEncoderReversed,
+            Swerve.kBLabsEncoderOffsetRad);
 
     private final SwerveTemplate backRight = new SwerveTemplate(
-            DriveConstants.kBackRightDriveMotorPort,
-            DriveConstants.kBackRightSteerMotorPort,
-            DriveConstants.kBackRightDriveAbsoluteEncoderPort,
-            DriveConstants.kBackRightDriveEncoderReversed,
-            DriveConstants.kBackRightSteerEncoderReversed,
-            DriveConstants.kBackRightDriveAbsoluteEncoderReversed,
-            DriveConstants.kBackRightDriveAbsoluteEncoderOffsetRad);
+            CanIDs.kBRDriveMotorPort,
+            CanIDs.kBRSteerMotorPort,
+            CanIDs.kBRabsEncoderPort,
+            IndividualModules.kBRDriveEncoderReversed,
+            IndividualModules.kBRSteerEncoderReversed,
+            IndividualModules.kBRabsEncoderReversed,
+            Swerve.kBRabsEncoderOffsetRad);
 
-    private final Pigeon2 gyro = new Pigeon2(DriveConstants.kPigeon2Port);
+    private final Pigeon2 gyro = new Pigeon2(CanIDs.kPigeon2Port);
     private final SwerveDriveOdometry odometer = new SwerveDriveOdometry(
-        DriveConstants.kDriveKinematics,
+        PhysicalConstants.kDriveKinematics,
         getRotation2d(),
         new SwerveModulePosition[]{
             frontLeft.getSwerveModulePosition(),
@@ -117,7 +124,8 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     public void setModuleStates(SwerveModuleState[] desiredStates) {
-        SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, DriveConstants.kPhysicalMaxSpeedMetersPerSecond);
+        SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, 
+            PhysicalConstants.kPhysicalMaxSpeed);
         frontLeft.setDesiredState(desiredStates[0]);
         frontRight.setDesiredState(desiredStates[1]);
         backLeft.setDesiredState(desiredStates[2]);
