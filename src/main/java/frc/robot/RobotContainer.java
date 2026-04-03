@@ -40,7 +40,9 @@ public class RobotContainer {
     }
 
     private void configureButtonBindings() {
-        new JoystickButton(driverJoytick, 2).whenPressed(() -> zeroHeading_hotfix.zeroHeading_hotfix());
+        new JoystickButton(driverJoytick, 
+                Constants.OIConstants.kDriverZeroHeadingButtonIdx)
+                .onTrue(new zeroHeading_hotfix());
     }
 
     public Command getAutonomousCommand() {

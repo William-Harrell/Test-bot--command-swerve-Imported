@@ -1,10 +1,11 @@
 package frc.robot.subsystems;
 
-
+import com.ctre.phoenix6.hardware.Pigeon2;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -14,43 +15,53 @@ import frc.robot.subsystems.Swerve.SwerveTemplate;
 public class SwerveSubsystem extends SubsystemBase {
     private final SwerveTemplate frontLeft = new SwerveTemplate(
             DriveConstants.kFrontLeftDriveMotorPort,
-            DriveConstants.kFrontLeftTurningMotorPort,
+            DriveConstants.kFrontLeftSteerMotorPort,
             DriveConstants.kFrontLeftDriveAbsoluteEncoderPort,
             DriveConstants.kFrontLeftDriveEncoderReversed,
-            DriveConstants.kFrontLeftTurningEncoderReversed,
+            DriveConstants.kFrontLeftSteerEncoderReversed,
             DriveConstants.kFrontLeftDriveAbsoluteEncoderReversed,            
             DriveConstants.kFrontLeftDriveAbsoluteEncoderOffsetRad);
 
     private final SwerveTemplate frontRight = new SwerveTemplate(
             DriveConstants.kFrontRightDriveMotorPort,
-            DriveConstants.kFrontRightTurningMotorPort,
+            DriveConstants.kFrontRightSteerMotorPort,
             DriveConstants.kFrontRightDriveAbsoluteEncoderPort,
             DriveConstants.kFrontRightDriveEncoderReversed,
-            DriveConstants.kFrontRightTurningEncoderReversed,
+            DriveConstants.kFrontRightSteerEncoderReversed,
             DriveConstants.kFrontRightDriveAbsoluteEncoderReversed,
             DriveConstants.kFrontRightDriveAbsoluteEncoderOffsetRad);
 
     private final SwerveTemplate backLeft = new SwerveTemplate(
             DriveConstants.kBackLeftDriveMotorPort,
-            DriveConstants.kBackLeftTurningMotorPort,
+            DriveConstants.kBackLeftSteerMotorPort,
             DriveConstants.kBackLeftDriveAbsoluteEncoderPort,
             DriveConstants.kBackLeftDriveEncoderReversed,
-            DriveConstants.kBackLeftTurningEncoderReversed,
+            DriveConstants.kBackLeftSteerEncoderReversed,
             DriveConstants.kBackLeftDriveAbsoluteEncoderReversed,
             DriveConstants.kBackLeftDriveAbsoluteEncoderOffsetRad);
 
     private final SwerveTemplate backRight = new SwerveTemplate(
             DriveConstants.kBackRightDriveMotorPort,
-            DriveConstants.kBackRightTurningMotorPort,
+            DriveConstants.kBackRightSteerMotorPort,
             DriveConstants.kBackRightDriveAbsoluteEncoderPort,
             DriveConstants.kBackRightDriveEncoderReversed,
-            DriveConstants.kBackRightTurningEncoderReversed,
+            DriveConstants.kBackRightSteerEncoderReversed,
             DriveConstants.kBackRightDriveAbsoluteEncoderReversed,
             DriveConstants.kBackRightDriveAbsoluteEncoderOffsetRad);
 
-    private final gyro = new ;
-    private final SwerveDriveOdometry odometer = new SwerveDriveOdometry(DriveConstants.kDriveKinematics,
-            new Rotation2d(0));
+    private final Pigeon2 gyro = new Pigeon2(DriveConstants.kPigeon2Port);
+    private final SwerveDriveOdometry odometer = new SwerveDriveOdometry(
+        DriveConstants.kDriveKinematics,
+        getRotation2d(),
+        new SwerveModulePosition[]{
+            frontLeft.getSwerveModulePosition(),
+            frontRight.getSwerveModulePosition(),
+            backLeft.getSwerveModulePosition(),
+            backRight.getSwerveModulePosition()
+        },
+        new Pose2d(0,0, new Rotation2d(0))
+        // TODO: change to actual starting pose when doing AUTO stuff
+        );
 
     public SwerveSubsystem() {
         new Thread(() -> {
@@ -67,7 +78,7 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     public double getHeading() {
-        return Math.IEEEremainder(gyro.getAngle(), 360);
+        return Math.IEEEremainder(gyro.getYaw().getValueAsDouble(), 360);
     }
 
     public Rotation2d getRotation2d() {
@@ -79,13 +90,21 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     public void resetOdometry(Pose2d pose) {
-        odometer.resetPosition(pose, getRotation2d());
+        odometer.resetPosition(getRotation2d(), new SwerveModulePosition[] {
+          frontLeft.getSwerveModulePosition(),   
+          frontRight.getSwerveModulePosition(), 
+          backLeft.getSwerveModulePosition(),
+          backRight.getSwerveModulePosition()}, 
+          pose);;
     }
 
     @Override
     public void periodic() {
-        odometer.update(getRotation2d(), frontLeft.getState(), frontRight.getState(), backLeft.getState(),
-                backRight.getState());
+        odometer.update(getRotation2d(), new SwerveModulePosition[] {
+          frontLeft.getSwerveModulePosition(),   
+          frontRight.getSwerveModulePosition(), 
+          backLeft.getSwerveModulePosition(),
+          backRight.getSwerveModulePosition()});
         SmartDashboard.putNumber("Robot Heading", getHeading());
         SmartDashboard.putString("Robot Location", getPose().getTranslation().toString());
     }
@@ -98,7 +117,7 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     public void setModuleStates(SwerveModuleState[] desiredStates) {
-        SwerveDriveKinematics.normalizeWheelSpeeds(desiredStates, DriveConstants.kPhysicalMaxSpeedMetersPerSecond);
+        SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, DriveConstants.kPhysicalMaxSpeedMetersPerSecond);
         frontLeft.setDesiredState(desiredStates[0]);
         frontRight.setDesiredState(desiredStates[1]);
         backLeft.setDesiredState(desiredStates[2]);

@@ -10,7 +10,7 @@ public final class Constants {
     public static final class ModuleConstants {
         public static final double kWheelDiameterMeters = Units.inchesToMeters(4);
         public static final double kDriveMotorGearRatio = 1 / 5.8462;
-        public static final double kSteeerMotorGearRatio = 1 / 18.0;
+        public static final double kSteerMotorGearRatio = 1 / 18.0;
         public static final double kDriveEncoderRot2Meter = kDriveMotorGearRatio * Math.PI * kWheelDiameterMeters;
         public static final double kSteerEncoderRot2Rad = kSteerMotorGearRatio * 2 * Math.PI;
         public static final double kDriveEncoderRPM2MeterPerSec = kDriveEncoderRot2Meter / 60;
@@ -22,6 +22,9 @@ public final class Constants {
 
     public static final class DriveConstants {
 
+            // Minimum speed to move in m/s
+        public static final double kMinSpeed = 0.001;
+
         public static final double kTrackWidth = Units.inchesToMeters(21);
         // Distance between right and left wheels
         public static final double kWheelBase = Units.inchesToMeters(25.5);
@@ -31,6 +34,8 @@ public final class Constants {
                 new Translation2d(kWheelBase / 2, kTrackWidth / 2),
                 new Translation2d(-kWheelBase / 2, -kTrackWidth / 2),
                 new Translation2d(-kWheelBase / 2, kTrackWidth / 2));
+
+        public static final int kPigeon2Port = 10;
 
         public static final int kFrontLeftDriveMotorPort = 8;
         public static final int kBackLeftDriveMotorPort = 2;
@@ -100,6 +105,7 @@ public final class Constants {
         public static final int kDriverXAxis = 0;
         public static final int kDriverRotAxis = 4;
         public static final int kDriverFieldOrientedButtonIdx = 1;
+        public static final int kDriverZeroHeadingButtonIdx = 2;
 
         public static final double kDeadband = 0.05;
     }

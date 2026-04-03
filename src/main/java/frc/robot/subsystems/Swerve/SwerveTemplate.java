@@ -4,18 +4,13 @@
 
 package frc.robot.subsystems.Swerve;
 
-import org.ejml.dense.row.misc.RrefGaussJordanRowPivot_DDRM;
-
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-
-import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -24,6 +19,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.MotorConstants;
 import frc.robot.Constants.ModuleConstants;
+import frc.robot.Constants.DriveConstants;
 
 public class SwerveTemplate extends SubsystemBase {
 
@@ -37,6 +33,7 @@ public class SwerveTemplate extends SubsystemBase {
     private final boolean absEncoderReversed;
     private final double absEncoderOffsetRad;
 
+    @SuppressWarnings("removal")
     public SwerveTemplate(int driveMotorId, int steerMotorId, int absEncoderId,
         boolean driveMotorReversed, boolean steerMotorReversed, boolean absEncoderReversed,
         double absEncoderOffset) {
@@ -76,17 +73,11 @@ public class SwerveTemplate extends SubsystemBase {
         this.absEncoderReversed = absEncoderReversed;
         absEncoder = new CANcoder(absEncoderId);
 
-
-
-        driveEncoder = driveMotor.getEncoder();
-        steerEncoder = steerMotor.getEncoder();
-
-        driveEncoder.setPositionConversionFactor(ModuleConstants.kDriveEncoderRot2Meter);
-        driveEncoder.setVelocityConversionFactor(ModuleConstants.kDriveEncoderRPM2MeterPerSec);
-        steerEncoder.setPositionConversionFactor(ModuleConstants.ksteerEncoderRot2Rad);
-        steerEncoder.setVelocityConversionFactor(ModuleConstants.ksteerEncoderRPM2RadPerSec);
-
-        steerPidController = new PIDController(ModuleConstants.kPsteer, 0, 0);
+        steerPidController = new PIDController(
+            ModuleConstants.kPSteer,
+            ModuleConstants.kISteer,
+            ModuleConstants.kDSteer
+        );
         steerPidController.enableContinuousInput(-Math.PI, Math.PI);
 
         resetEncoders();
@@ -133,8 +124,9 @@ public class SwerveTemplate extends SubsystemBase {
     }
 
     // TODO: Fix below in the command/Module area
-    public void setDesiredState(SwerveModuleState state) {
-    if (Math.abs(desiredState.speedMetersPerSecond) < StaticConstants.MotorConstants.kMinSpeed) {
+    public void setDesiredState(SwerveModuleState desiredState) {
+    if (Math.abs(desiredState.speedMetersPerSecond) < 
+        DriveConstants.kMinSpeed) {
       stop();
       return;
     }
@@ -147,13 +139,13 @@ public class SwerveTemplate extends SubsystemBase {
     correctedDesiredState.optimize(new Rotation2d(absEncoder.getPosition().getValueAsDouble()));
 
     driveMotor.set(desiredState.speedMetersPerSecond / 
-        StaticConstants.ModuleConstants.PhysicalConstants.kPhysicalMaxSpeedMetersPerSecond);
+        DriveConstants.kPhysicalMaxSpeedMetersPerSecond);
     steerMotor.set(steerPidController.calculate(getSteerPosition(), 
         desiredState.angle.getRadians()));
 
 
 
-        SmartDashboard.putString("Swerve[" + absEncoder.getChannel() + "] state", state.toString());
+        SmartDashboard.putString("Swerve[" + absEncoder.getDeviceID() + "] state", desiredState.toString());
     }
 
     public SwerveModulePosition getSwerveModulePosition() {
@@ -164,4 +156,9 @@ public class SwerveTemplate extends SubsystemBase {
         driveMotor.set(0);
         steerMotor.set(0);
     }
+    @Override
+    public void periodic() {
+        // This method will be called once per scheduler run
+        // might have to put signal requester for the falcons here
+  }
 }
