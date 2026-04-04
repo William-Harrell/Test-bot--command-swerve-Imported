@@ -35,9 +35,11 @@ public class RobotContainer {
     public RobotContainer() {
         swerveSubsystem.setDefaultCommand(new SwerveTeleop(
                 swerveSubsystem,
+                // WPILib field frame: +x forward, +y left, CCW+ rotation.
+                // XBox sticks report +Y down and +X right, so negate all three.
                 () -> -driverJoytick.getRawAxis(ControllerConstants.kDriverYAxis),
-                () -> driverJoytick.getRawAxis(ControllerConstants.kDriverXAxis),
-                () -> driverJoytick.getRawAxis(ControllerConstants.kDriverRotAxis),
+                () -> -driverJoytick.getRawAxis(ControllerConstants.kDriverXAxis),
+                () -> -driverJoytick.getRawAxis(ControllerConstants.kDriverRotAxis),
                 () -> !driverJoytick.getRawButton(ControllerConstants.kDriverFieldOrientedButtonIdx)));
 
         //configureButtonBindings();

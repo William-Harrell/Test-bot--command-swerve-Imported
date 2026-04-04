@@ -54,15 +54,17 @@ public class SwerveConstants {
             public static final double kSteerMotorGearRatio = SteerGearRatio;
 
 
-            public static final double kDriveEncoderRot2Meter = kDriveMotorGearRatio * Math.PI * kWheelDiameterMeters;
-            public static final double kSteerEncoderRot2Rad = kSteerMotorGearRatio * 2 * Math.PI;
+            public static final double kDriveEncoderRot2Meter = Math.PI * kWheelDiameterMeters / kDriveMotorGearRatio;
+            public static final double kSteerEncoderRot2Rad = 2 * Math.PI / kSteerMotorGearRatio;
             public static final double kDriveEncoderRPM2MeterPerSec = kDriveEncoderRot2Meter / 60;
             public static final double kSteerEncoderRPM2RadPerSec = kSteerEncoderRot2Rad / 60;
+            // Order must match SwerveSubsystem.setModuleStates: FL, FR, BL, BR
+            // WPILib convention: +x forward, +y left
             public static final SwerveDriveKinematics kDriveKinematics = new SwerveDriveKinematics(
-                new Translation2d(kWheelBase / 2, -kTrackWidth / 2),
-                new Translation2d(kWheelBase / 2, kTrackWidth / 2),
-                new Translation2d(-kWheelBase / 2, -kTrackWidth / 2),
-                new Translation2d(-kWheelBase / 2, kTrackWidth / 2));
+                new Translation2d(kWheelBase / 2, kTrackWidth / 2),   // FL
+                new Translation2d(kWheelBase / 2, -kTrackWidth / 2),  // FR
+                new Translation2d(-kWheelBase / 2, kTrackWidth / 2),  // BL
+                new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));// BR
         }
 
         public static final class TeleopDriving {

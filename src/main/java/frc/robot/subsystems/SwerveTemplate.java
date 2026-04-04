@@ -16,14 +16,13 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 
 import frc.robot.z_constants.DialingConstants.Swerve;
 import frc.robot.z_constants.SwerveConstants.AllModules.CurrentLimits;
 import frc.robot.z_constants.SwerveConstants.AllModules.PhysicalConstants;
 
-public class SwerveTemplate extends SubsystemBase {
+public class SwerveTemplate {
 
     private final SparkMax driveMotor;
     private final SparkMax steerMotor;
@@ -114,10 +113,13 @@ public class SwerveTemplate extends SubsystemBase {
     }
 
     public double getabsEncoderRad() {
-        double angle = absEncoder.getAbsolutePosition().getValueAsDouble();
-        angle -= absEncoderOffsetRad;
-        angle *= 2.0 * Math.PI;
-        return angle * (absEncoderReversed ? -1.0 : 1.0);
+        // CANcoder getAbsolutePosition() is in rotations. Offsets stored in
+        // DialingConstants are also in rotations. Subtract in rotation-space,
+        // then convert to radians.
+        double rotations = absEncoder.getAbsolutePosition().getValueAsDouble();
+        rotations -= absEncoderOffsetRad;
+        double radians = rotations * 2.0 * Math.PI;
+        return radians * (absEncoderReversed ? -1.0 : 1.0);
     }
 
     public void resetEncoders() {
@@ -129,27 +131,24 @@ public class SwerveTemplate extends SubsystemBase {
         return new SwerveModuleState(getDriveVelocity(), new Rotation2d(getSteerPosition()));
     }
 
-    // TODO: Fix below in the command/Module area
     public void setDesiredState(SwerveModuleState desiredState) {
-    if (Math.abs(desiredState.speedMetersPerSecond) < 
-        PhysicalConstants.kMinSpeed) {
-      stop();
-      return;
-    }
-    // Apply chassis angular offset to the desired state.
-    SwerveModuleState correctedDesiredState = new SwerveModuleState();
-    correctedDesiredState.speedMetersPerSecond = desiredState.speedMetersPerSecond;
-    correctedDesiredState.angle = desiredState.angle.plus(Rotation2d.fromRotations(absEncoderOffsetRad));
+        if (Math.abs(desiredState.speedMetersPerSecond) <
+            PhysicalConstants.kMinSpeed) {
+            stop();
+            return;
+        }
 
-    // Optimize the reference state to avoid spinning further than 90 degrees.
-    correctedDesiredState.optimize(new Rotation2d(absEncoder.getPosition().getValueAsDouble() * (2 * Math.PI)));
+        // Offset is already baked into the NEO steer encoder via resetEncoders(),
+        // so pass the desired angle through unmodified.
+        // Optimize in the same reference frame as the PID measurement (getSteerPosition()).
+        desiredState.optimize(new Rotation2d(getSteerPosition()));
 
-    driveMotor.set(correctedDesiredState.speedMetersPerSecond / 
-        PhysicalConstants.kPhysicalMaxSpeed);
-    steerMotor.set(HeadingPidController.calculate(getSteerPosition(), 
-        correctedDesiredState.angle.getRadians()));
-        SmartDashboard.putString("Swerve[" + driveMotor.getDeviceId() + 
-            "] state", correctedDesiredState.toString());
+        driveMotor.set(desiredState.speedMetersPerSecond /
+            PhysicalConstants.kPhysicalMaxSpeed);
+        steerMotor.set(HeadingPidController.calculate(getSteerPosition(),
+            desiredState.angle.getRadians()));
+        SmartDashboard.putString("Swerve[" + driveMotor.getDeviceId() +
+            "] state", desiredState.toString());
     }
 
     public SwerveModulePosition getSwerveModulePosition() {
@@ -160,9 +159,4 @@ public class SwerveTemplate extends SubsystemBase {
         driveMotor.set(0);
         steerMotor.set(0);
     }
-    @Override
-    public void periodic() {
-        // This method will be called once per scheduler run
-        // might have to put signal requester for the falcons here
-  }
 }
