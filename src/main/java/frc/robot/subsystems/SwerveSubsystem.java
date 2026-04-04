@@ -114,6 +114,18 @@ public class SwerveSubsystem extends SubsystemBase {
           backRight.getSwerveModulePosition()});
         SmartDashboard.putNumber("Robot Heading", getHeading());
         SmartDashboard.putString("Robot Location", getPose().getTranslation().toString());
+
+        SmartDashboard.putNumber("FLDriveMotor", frontLeft.getDriveVelocity());
+        SmartDashboard.putNumber("FLSteerMotor", frontLeft.getSteerVelocity());
+
+        SmartDashboard.putNumber("FRDriveMotor", frontRight.getDriveVelocity());
+        SmartDashboard.putNumber("FRSteerMotor", frontRight.getSteerVelocity());
+
+        SmartDashboard.putNumber("BLDriveMotor", backLeft.getDriveVelocity());
+        SmartDashboard.putNumber("BLSteerMotor", backLeft.getSteerVelocity());
+        
+        SmartDashboard.putNumber("BRDriveMotor", backRight.getDriveVelocity());
+        SmartDashboard.putNumber("BRSteerMotor", backRight.getSteerVelocity());
     }
 
     public void stopModules() {

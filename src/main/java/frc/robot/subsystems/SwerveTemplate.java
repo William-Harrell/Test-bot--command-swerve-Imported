@@ -144,7 +144,7 @@ public class SwerveTemplate extends SubsystemBase {
         PhysicalConstants.kPhysicalMaxSpeed);
     steerMotor.set(steerPidController.calculate(getSteerPosition(), 
         desiredState.angle.getRadians()));
-        SmartDashboard.putString("Swerve[" + absEncoder.getDeviceID() + 
+        SmartDashboard.putString("Swerve[" + driveMotor.getDeviceId() + 
             "] state", desiredState.toString());
     }
 

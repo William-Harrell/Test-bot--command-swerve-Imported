@@ -47,11 +47,11 @@ public class SwerveConstants {
             public static final double kPhysicalMaxAngularSpeed = 2 * 2 * Math.PI; // No idea
 
             public static final double kWheelDiameterMeters = Units.inchesToMeters(4);
-            public static final double kDriveMotorGearRatio = 1 / 6.75;
+            public static final double kDriveMotorGearRatio = 6.75;
                 private static final double SteerGearRatioNUM = 150;
                 private static final double SteerGearRatioDOM = 7;
                 private static final double SteerGearRatio = SteerGearRatioNUM / SteerGearRatioDOM;
-            public static final double kSteerMotorGearRatio = 1 / SteerGearRatio;
+            public static final double kSteerMotorGearRatio = SteerGearRatio;
 
 
             public static final double kDriveEncoderRot2Meter = kDriveMotorGearRatio * Math.PI * kWheelDiameterMeters;
@@ -93,7 +93,7 @@ public class SwerveConstants {
 
         public static final class CurrentLimits {
                 // All Drive motors
-            public static final int kDriveStatorCurrentLimit = 80;
+            public static final int kDriveStatorCurrentLimit = 100;
             public static final int kDriveSupplyCurrentLimit = 60;
                 // All Steer motors
             public static final int kSteerStatorCurrentLimit = 50;

@@ -19,9 +19,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.SwerveTeleop;
-import frc.robot.commands.zeroHeading_hotfix;
 import frc.robot.subsystems.SwerveSubsystem;
 
 import frc.robot.z_constants.ControllerConstants;
@@ -42,14 +40,13 @@ public class RobotContainer {
                 () -> driverJoytick.getRawAxis(ControllerConstants.kDriverRotAxis),
                 () -> !driverJoytick.getRawButton(ControllerConstants.kDriverFieldOrientedButtonIdx)));
 
-        configureButtonBindings();
+        //configureButtonBindings();
     }
 
-    private void configureButtonBindings() {
-        new JoystickButton(driverJoytick, 
-                ControllerConstants.kDriverZeroHeadingButtonIdx)
-                .onTrue(new zeroHeading_hotfix());
-    }
+    //private void configureButtonBindings() {
+        //new JoystickButton(driverJoytick, 
+        //        ControllerConstants.kDriverZeroHeadingButtonIdx)
+        //        .onTrue(new zeroHeading_hotfix()); }
 
     public Command getAutonomousCommand() {
         // 1. Create trajectory settings
