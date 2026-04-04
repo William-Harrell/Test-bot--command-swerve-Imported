@@ -29,8 +29,7 @@ public class SwerveTemplate extends SubsystemBase {
     private final SparkMax steerMotor;
     private final CANcoder absEncoder;
     
-
-    private final PIDController steerPidController;
+    private final PIDController HeadingPidController;
 
     private final boolean absEncoderReversed;
     private final double absEncoderOffsetRad;
@@ -42,11 +41,13 @@ public class SwerveTemplate extends SubsystemBase {
 
       driveMotor = new SparkMax(driveMotorId, MotorType.kBrushless);
         SparkMaxConfig configsDrive = new SparkMaxConfig();
-        configsDrive.closedLoop.pid(
+        /*
+          configsDrive.closedLoop.pid(
             Swerve.MotorPID.kDriveP,
             Swerve.MotorPID.kDriveI, 
             Swerve.MotorPID.kDriveD);
-        configsDrive.inverted(driveMotorReversed);
+        */
+            configsDrive.inverted(driveMotorReversed);
         configsDrive.smartCurrentLimit(
             CurrentLimits.kDriveStatorCurrentLimit, 
             CurrentLimits.kDriveSupplyCurrentLimit);
@@ -55,12 +56,15 @@ public class SwerveTemplate extends SubsystemBase {
             ResetMode.kNoResetSafeParameters, 
             PersistMode.kNoPersistParameters);
 
+
       steerMotor = new SparkMax(steerMotorId, MotorType.kBrushless);
         SparkMaxConfig configsSteer = new SparkMaxConfig();
-        configsSteer.closedLoop.pid(
+        /*
+          configsSteer.closedLoop.pid(
             Swerve.MotorPID.kSteerP,
             Swerve.MotorPID.kSteerI, 
             Swerve.MotorPID.kSteerD);
+        */
         configsSteer.inverted(steerMotorReversed);
         configsSteer.smartCurrentLimit(
             CurrentLimits.kSteerStatorCurrentLimit, 
@@ -75,44 +79,44 @@ public class SwerveTemplate extends SubsystemBase {
         this.absEncoderReversed = absEncoderReversed;
         absEncoder = new CANcoder(absEncoderId);
 
-        steerPidController = new PIDController(
+        HeadingPidController = new PIDController(
             Swerve.HeadingPID.kSteerP,
             Swerve.HeadingPID.kSteerI,
             Swerve.HeadingPID.kSteerD
         );
-        steerPidController.enableContinuousInput(-Math.PI, Math.PI);
+        HeadingPidController.enableContinuousInput(-Math.PI, Math.PI);
 
         resetEncoders();
     }
 
     public double getDrivePosition() {
-        var DrivePosition = driveMotor.getEncoder().getPosition() * 
+        double DrivePosition = driveMotor.getEncoder().getPosition() * 
             PhysicalConstants.kDriveEncoderRot2Meter;
         return DrivePosition;
     }
 
     public double getSteerPosition() {
-        var SteerPosition = steerMotor.getEncoder().getPosition() * 
+        double SteerPosition = steerMotor.getEncoder().getPosition() * 
             PhysicalConstants.kSteerEncoderRot2Rad;
         return SteerPosition;
     }
 
     public double getDriveVelocity() {
-        var DriveVelocity = driveMotor.getEncoder().getVelocity() * 
+        double DriveVelocity = driveMotor.getEncoder().getVelocity() * 
             PhysicalConstants.kDriveEncoderRPM2MeterPerSec;
         return DriveVelocity;
     }
 
     public double getSteerVelocity() {
-        var SteerVelocity = steerMotor.getEncoder().getVelocity() * 
+        double SteerVelocity = steerMotor.getEncoder().getVelocity() * 
             PhysicalConstants.kSteerEncoderRPM2RadPerSec;
         return SteerVelocity;
     }
 
     public double getabsEncoderRad() {
         double angle = absEncoder.getAbsolutePosition().getValueAsDouble();
-        angle *= 2.0 * Math.PI;
         angle -= absEncoderOffsetRad;
+        angle *= 2.0 * Math.PI;
         return angle * (absEncoderReversed ? -1.0 : 1.0);
     }
 
@@ -135,17 +139,17 @@ public class SwerveTemplate extends SubsystemBase {
     // Apply chassis angular offset to the desired state.
     SwerveModuleState correctedDesiredState = new SwerveModuleState();
     correctedDesiredState.speedMetersPerSecond = desiredState.speedMetersPerSecond;
-    correctedDesiredState.angle = desiredState.angle.plus(Rotation2d.fromRadians(absEncoderOffsetRad));
+    correctedDesiredState.angle = desiredState.angle.plus(Rotation2d.fromRotations(absEncoderOffsetRad));
 
     // Optimize the reference state to avoid spinning further than 90 degrees.
-    correctedDesiredState.optimize(new Rotation2d(absEncoder.getPosition().getValueAsDouble()));
+    correctedDesiredState.optimize(new Rotation2d(absEncoder.getPosition().getValueAsDouble() * (2 * Math.PI)));
 
-    driveMotor.set(desiredState.speedMetersPerSecond / 
+    driveMotor.set(correctedDesiredState.speedMetersPerSecond / 
         PhysicalConstants.kPhysicalMaxSpeed);
-    steerMotor.set(steerPidController.calculate(getSteerPosition(), 
-        desiredState.angle.getRadians()));
+    steerMotor.set(HeadingPidController.calculate(getSteerPosition(), 
+        correctedDesiredState.angle.getRadians()));
         SmartDashboard.putString("Swerve[" + driveMotor.getDeviceId() + 
-            "] state", desiredState.toString());
+            "] state", correctedDesiredState.toString());
     }
 
     public SwerveModulePosition getSwerveModulePosition() {

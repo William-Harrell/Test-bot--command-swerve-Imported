@@ -27,7 +27,7 @@ public class DialingConstants {
             // All Steer Motors
             public static final double kSteerP = 0.3;
             public static final double kSteerI = 0.0;
-            public static final double kSteerD = 0.0;
+            public static final double kSteerD = 0.01;
         }
     }
 }

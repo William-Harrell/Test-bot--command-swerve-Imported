@@ -26,8 +26,8 @@ public class SwerveConstants {
         public static final boolean kBLSteerEncoderReversed = false;
         public static final boolean kBLabsEncoderReversed = false;
 
-        public static final boolean kBRSteerEncoderReversed = false;
         public static final boolean kBRDriveEncoderReversed = false;
+        public static final boolean kBRSteerEncoderReversed = false;
         public static final boolean kBRabsEncoderReversed = false;
     }
 
@@ -36,7 +36,7 @@ public class SwerveConstants {
 
         public static final class PhysicalConstants {
                 // Minimum speed to move in m/s
-            public static final double kMinSpeed = 0.005;
+            public static final double kMinSpeed = 0.01;
                 // Distance between right and left wheels
             public static final double kTrackWidth = Units.inchesToMeters(19);
                 // Distance between front and back wheels
