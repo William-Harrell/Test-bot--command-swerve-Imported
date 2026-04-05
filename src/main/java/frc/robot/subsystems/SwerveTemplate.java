@@ -124,7 +124,10 @@ public class SwerveTemplate {
 
     public void resetEncoders() {
         driveMotor.getEncoder().setPosition(0);
-        steerMotor.getEncoder().setPosition(getabsEncoderRad());
+        // getabsEncoderRad() is in radians; NEO relative encoder's setPosition()
+        // expects motor rotations, so divide by the rot->rad conversion factor.
+        steerMotor.getEncoder().setPosition(
+            getabsEncoderRad() / PhysicalConstants.kSteerEncoderRot2Rad);
     }
 
     public SwerveModuleState getState() {
