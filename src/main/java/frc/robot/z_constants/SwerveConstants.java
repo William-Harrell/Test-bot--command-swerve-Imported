@@ -16,19 +16,23 @@ public class SwerveConstants {
             //TODO: Might have to fix these
         public static final boolean kFLDriveEncoderReversed = false;
         public static final boolean kFLSteerEncoderReversed = false;
-        public static final boolean kFLabsEncoderReversed = false;
+        // abs flag flipped true: CANcoder counts opposite to NEO hardware
+        // direction on this chassis; negating getabsEncoderRad() puts both
+        // sensors in the same sign convention so the PID measurement and
+        // the abs seed agree after motion, not just at boot.
+        public static final boolean kFLabsEncoderReversed = true;
 
         public static final boolean kFRDriveEncoderReversed = false;
         public static final boolean kFRSteerEncoderReversed = false;
-        public static final boolean kFRabsEncoderReversed = false;
+        public static final boolean kFRabsEncoderReversed = true;
 
         public static final boolean kBLDriveEncoderReversed = false;
         public static final boolean kBLSteerEncoderReversed = false;
-        public static final boolean kBLabsEncoderReversed = false;
+        public static final boolean kBLabsEncoderReversed = true;
 
         public static final boolean kBRDriveEncoderReversed = false;
         public static final boolean kBRSteerEncoderReversed = false;
-        public static final boolean kBRabsEncoderReversed = false;
+        public static final boolean kBRabsEncoderReversed = true;
     }
 
     public static final class AllModules {
