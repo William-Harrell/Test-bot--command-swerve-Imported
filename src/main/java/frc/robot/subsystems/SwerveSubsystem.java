@@ -117,15 +117,23 @@ public class SwerveSubsystem extends SubsystemBase {
 
         SmartDashboard.putNumber("FLDriveMotor", frontLeft.getDriveVelocity());
         SmartDashboard.putNumber("FLSteerMotor", frontLeft.getSteerVelocity());
+        SmartDashboard.putNumber("FL Angle (deg)", Math.toDegrees(frontLeft.getSteerPosition()));
+        SmartDashboard.putNumber("FL Abs (deg)", Math.toDegrees(frontLeft.getabsEncoderRad()));
 
         SmartDashboard.putNumber("FRDriveMotor", frontRight.getDriveVelocity());
         SmartDashboard.putNumber("FRSteerMotor", frontRight.getSteerVelocity());
+        SmartDashboard.putNumber("FR Angle (deg)", Math.toDegrees(frontRight.getSteerPosition()));
+        SmartDashboard.putNumber("FR Abs (deg)", Math.toDegrees(frontRight.getabsEncoderRad()));
 
         SmartDashboard.putNumber("BLDriveMotor", backLeft.getDriveVelocity());
         SmartDashboard.putNumber("BLSteerMotor", backLeft.getSteerVelocity());
-        
+        SmartDashboard.putNumber("BL Angle (deg)", Math.toDegrees(backLeft.getSteerPosition()));
+        SmartDashboard.putNumber("BL Abs (deg)", Math.toDegrees(backLeft.getabsEncoderRad()));
+
         SmartDashboard.putNumber("BRDriveMotor", backRight.getDriveVelocity());
         SmartDashboard.putNumber("BRSteerMotor", backRight.getSteerVelocity());
+        SmartDashboard.putNumber("BR Angle (deg)", Math.toDegrees(backRight.getSteerPosition()));
+        SmartDashboard.putNumber("BR Abs (deg)", Math.toDegrees(backRight.getabsEncoderRad()));
     }
 
     public void stopModules() {
