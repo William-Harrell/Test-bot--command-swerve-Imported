@@ -40,38 +40,41 @@ public class SwerveTemplate {
 
       driveMotor = new SparkMax(driveMotorId, MotorType.kBrushless);
         SparkMaxConfig configsDrive = new SparkMaxConfig();
-        /*
-          configsDrive.closedLoop.pid(
-            Swerve.MotorPID.kDriveP,
-            Swerve.MotorPID.kDriveI, 
-            Swerve.MotorPID.kDriveD);
-        */
-            configsDrive.inverted(driveMotorReversed);
+        configsDrive.inverted(driveMotorReversed);
         configsDrive.smartCurrentLimit(
-            CurrentLimits.kDriveStatorCurrentLimit, 
+            CurrentLimits.kDriveStatorCurrentLimit,
             CurrentLimits.kDriveSupplyCurrentLimit);
         configsDrive.idleMode(IdleMode.kCoast);
-        driveMotor.configure(configsDrive, 
-            ResetMode.kNoResetSafeParameters, 
-            PersistMode.kNoPersistParameters);
+        // Force the built-in encoder back to raw motor rotations / RPM,
+        // in case a prior deploy left a persisted conversion factor on the
+        // controller. Unit conversion lives in getDrivePosition/Velocity.
+        configsDrive.encoder
+            .positionConversionFactor(1.0)
+            .velocityConversionFactor(1.0);
+        // kResetSafeParameters wipes any persisted config from prior deploys
+        // before applying ours; kPersistParameters saves our config to NVRAM
+        // so it survives power cycles deterministically.
+        driveMotor.configure(configsDrive,
+            ResetMode.kResetSafeParameters,
+            PersistMode.kPersistParameters);
 
 
       steerMotor = new SparkMax(steerMotorId, MotorType.kBrushless);
         SparkMaxConfig configsSteer = new SparkMaxConfig();
-        /*
-          configsSteer.closedLoop.pid(
-            Swerve.MotorPID.kSteerP,
-            Swerve.MotorPID.kSteerI, 
-            Swerve.MotorPID.kSteerD);
-        */
         configsSteer.inverted(steerMotorReversed);
         configsSteer.smartCurrentLimit(
-            CurrentLimits.kSteerStatorCurrentLimit, 
+            CurrentLimits.kSteerStatorCurrentLimit,
             CurrentLimits.kSteerSupplyCurrentLimit);
         configsSteer.idleMode(IdleMode.kBrake);
-        steerMotor.configure(configsSteer, 
-            ResetMode.kNoResetSafeParameters, 
-            PersistMode.kNoPersistParameters);
+        // Same reasoning as the drive config above: force the NEO encoder
+        // back to raw motor rotations so getSteerPosition()'s rot->rad
+        // conversion is the only scaling in the signal path.
+        configsSteer.encoder
+            .positionConversionFactor(1.0)
+            .velocityConversionFactor(1.0);
+        steerMotor.configure(configsSteer,
+            ResetMode.kResetSafeParameters,
+            PersistMode.kPersistParameters);
         
 
         this.absEncoderOffsetRad = absEncoderOffset;
